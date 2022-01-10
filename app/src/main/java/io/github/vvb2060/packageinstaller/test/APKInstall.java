@@ -55,19 +55,13 @@ public final class APKInstall {
     }
 
     public static void register(Context context) {
-        var receiver = new InstallReceiver(context);
+        var receiver = new InstallReceiver();
         context.registerReceiver(receiver, new IntentFilter(TAG));
     }
 
     private static class InstallReceiver extends BroadcastReceiver {
-        private final Context context;
-
-        private InstallReceiver(Context context) {
-            this.context = context;
-        }
-
         @Override
-        public void onReceive(Context c, Intent i) {
+        public void onReceive(Context context, Intent i) {
             int status = i.getIntExtra(EXTRA_STATUS, STATUS_FAILURE_INVALID);
             switch (status) {
                 case STATUS_PENDING_USER_ACTION:
@@ -76,9 +70,12 @@ public final class APKInstall {
                     context.startActivity(intent);
                     break;
                 case STATUS_SUCCESS:
+                    break;
                 default:
                     Log.d(TAG, "onReceive: status=" + status);
-                    context.unregisterReceiver(this);
+                    var installer = context.getPackageManager().getPackageInstaller();
+                    installer.getMySessions().forEach(s -> installer.abandonSession(s.getSessionId()));
+                    break;
             }
         }
     }
