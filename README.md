@@ -1,6 +1,8 @@
-# PackageInstaller Test
+# PackageInstaller 静默升级 演示应用
 
-用于检测 [PackageInstaller API](https://developer.android.com/reference/android/content/pm/PackageInstaller) 是否正常的测试应用。该 API 自 API 级别 21（Android5.0）起可用。
+用于检测 [PackageInstaller API](https://developer.android.com/reference/android/content/pm/PackageInstaller) 是否正常的测试应用。
+该 API 自 API 级别 21（Android 5.0）起可用。
+从 API 级别 31（Android 12）起，PackageInstaller 支持静默升级。
 
 ## MIUI 破坏了此 API
 
@@ -29,5 +31,8 @@ E/PKMSImpl: MIUILOG- assertCallerAndPackage: uid=10018, installerPkg=io.github.v
 4. 30 秒以内没有静默升级过同一款应用。参考 [SilentUpdatePolicy](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-12.0.0_r26/services/core/java/com/android/server/pm/SilentUpdatePolicy.java)。
 5. 永远做好接收`STATUS_PENDING_USER_ACTION`的准备。
 
-用户非常容易把静默升级当成应用崩溃，因此需要合理的引导。应用打开时触发的升级可接收`android.intent.action.MY_PACKAGE_REPLACED`广播弹出更新完成通知。
-但更建议在后台进行升级，如果需要用户确认可发送通知。由于安装会话除非显式放弃，否则一直可用，包括在重启设备后，因此也可等待下次打开应用时让用户确认。
+用户非常容易把静默升级当成应用崩溃，因此需要合理的引导。
+应用打开时触发的升级可接收`android.intent.action.MY_PACKAGE_REPLACED`广播弹出更新完成通知。
+但更建议在后台进行升级，如果需要用户确认可发送通知。
+
+由于安装会话除非显式放弃，否则一直可用，包括在重启设备后，因此也可等待下次打开应用时让用户确认（此功能本演示应用未实现，一律直接丢弃）。
