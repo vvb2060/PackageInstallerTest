@@ -1,10 +1,15 @@
 package io.github.vvb2060.packageinstaller.test;
 
+import static android.app.NotificationManager.IMPORTANCE_HIGH;
 import static android.content.pm.PackageInstaller.EXTRA_STATUS;
+import static android.content.pm.PackageInstaller.EXTRA_STATUS_MESSAGE;
 import static android.content.pm.PackageInstaller.STATUS_FAILURE_INVALID;
 import static android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION;
 import static android.content.pm.PackageInstaller.STATUS_SUCCESS;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +17,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInstaller.Session;
 import android.content.pm.PackageInstaller.SessionParams;
+import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.util.Log;
 
@@ -66,16 +72,38 @@ public final class APKInstall {
             switch (status) {
                 case STATUS_PENDING_USER_ACTION:
                     Intent intent = i.getParcelableExtra(Intent.EXTRA_INTENT);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent);
+                    handleUserAction(context, intent);
                     break;
                 case STATUS_SUCCESS:
                     break;
                 default:
-                    Log.d(TAG, "onReceive: status=" + status);
+                    Log.e(TAG, "onReceive: status=" + status +
+                            " message= " + i.getStringExtra(EXTRA_STATUS_MESSAGE));
                     var installer = context.getPackageManager().getPackageInstaller();
                     installer.getMySessions().forEach(s -> installer.abandonSession(s.getSessionId()));
                     break;
+            }
+        }
+
+        private void handleUserAction(Context context, Intent intent) {
+            if (MainActivity.Foreground) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            } else {
+                var nm = context.getSystemService(NotificationManager.class);
+                var channelID = "User Action";
+                var channel = new NotificationChannel(channelID, channelID, IMPORTANCE_HIGH);
+                nm.createNotificationChannel(channel);
+                var flag = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+                var pending = PendingIntent.getActivity(context, 0, intent, flag);
+                var icon = Icon.createWithResource(context, android.R.drawable.stat_sys_download_done);
+                var builder = new Notification.Builder(context, channelID)
+                        .setContentIntent(pending)
+                        .setContentTitle("ready to update")
+                        .setContentText("tap to install")
+                        .setSmallIcon(icon)
+                        .setAutoCancel(true);
+                nm.notify(24, builder.build());
             }
         }
     }

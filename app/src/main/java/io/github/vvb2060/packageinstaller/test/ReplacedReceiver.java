@@ -12,7 +12,7 @@ import android.content.Intent;
 import android.graphics.drawable.Icon;
 
 public final class ReplacedReceiver extends BroadcastReceiver {
-    private static final String ChannelID = "replaced";
+    private static final String ChannelID = "App Updated";
     private static final int NotificationID = 42;
 
     @Override
@@ -35,7 +35,7 @@ public final class ReplacedReceiver extends BroadcastReceiver {
         var icon = Icon.createWithResource(context, android.R.drawable.ic_dialog_info);
         var builder = new Notification.Builder(context, ChannelID);
         return builder.setContentIntent(pending)
-                .setContentTitle("apk updated")
+                .setContentTitle("app updated")
                 .setContentText("tap to open")
                 .setSmallIcon(icon)
                 .setAutoCancel(true)
