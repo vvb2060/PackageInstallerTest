@@ -1,6 +1,7 @@
 package io.github.vvb2060.packageinstaller.test;
 
 import static android.app.NotificationManager.IMPORTANCE_HIGH;
+import static android.content.pm.PackageInstaller.EXTRA_SESSION_ID;
 import static android.content.pm.PackageInstaller.EXTRA_STATUS;
 import static android.content.pm.PackageInstaller.EXTRA_STATUS_MESSAGE;
 import static android.content.pm.PackageInstaller.STATUS_FAILURE_INVALID;
@@ -78,10 +79,15 @@ public final class APKInstall {
                     break;
                 default:
                     Log.e(TAG, "onReceive: status=" + status +
-                            " message= " + i.getStringExtra(EXTRA_STATUS_MESSAGE));
-                    var installer = context.getPackageManager().getPackageInstaller();
-                    installer.getMySessions().forEach(s -> installer.abandonSession(s.getSessionId()));
-                    break;
+                            " message=" + i.getStringExtra(EXTRA_STATUS_MESSAGE));
+                    int id = i.getIntExtra(EXTRA_SESSION_ID, 0);
+                    if (id > 0) {
+                        var installer = context.getPackageManager().getPackageInstaller();
+                        var info = installer.getSessionInfo(id);
+                        if (info != null) {
+                            installer.abandonSession(info.getSessionId());
+                        }
+                    }
             }
         }
 
