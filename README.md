@@ -35,4 +35,6 @@ E/PKMSImpl: MIUILOG- assertCallerAndPackage: uid=10018, installerPkg=io.github.v
 应用打开时触发的升级可接收`android.intent.action.MY_PACKAGE_REPLACED`广播弹出更新完成通知。
 但更建议在后台进行升级，如果需要用户确认可发送通知。
 
+对于更新完成后自动打开应用的需求，在 Android 10 及以上的系统要求具有悬浮窗权限。
+
 由于安装会话除非显式放弃，否则一直可用，包括在重启设备后，因此也可等待下次打开应用时让用户确认（此功能本演示应用未实现，一律直接丢弃）。
