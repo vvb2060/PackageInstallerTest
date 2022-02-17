@@ -29,12 +29,12 @@ E/PKMSImpl: MIUILOG- assertCallerAndPackage: uid=10018, installerPkg=io.github.v
 2. 升级自身或由自己安装的应用。升级其它应用时，需要该应用的安装者为自己，即以前通过 PackageInstaller API 安装的应用，系统安装器无效。
 3. apk 已经适配 Android 10 或更高。即 Target API >= 29，此条件以后会增加。
 4. 30 秒以内没有静默升级过同一款应用。参考 [SilentUpdatePolicy](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-12.0.0_r26/services/core/java/com/android/server/pm/SilentUpdatePolicy.java)。
-5. 永远做好接收`STATUS_PENDING_USER_ACTION`的准备。
+
+永远做好接收`STATUS_PENDING_USER_ACTION`的准备，即使满足上述全部要求。
 
 用户非常容易把静默升级当成应用崩溃，因此需要合理的引导。
 应用打开时触发的升级可接收`android.intent.action.MY_PACKAGE_REPLACED`广播弹出更新完成通知。
-但更建议在后台进行升级，如果需要用户确认可发送通知。
-
 对于更新完成后自动打开应用的需求，在 Android 10 及以上的系统要求具有悬浮窗权限。
 
+但更建议在后台进行升级，如果需要用户确认可发送通知。
 由于安装会话除非显式放弃，否则一直可用，包括在重启设备后，因此也可等待下次打开应用时让用户确认（此功能本演示应用未实现，一律直接丢弃）。
